@@ -1,8 +1,15 @@
+import { useState } from 'react';
 import MobileGate from './components/MobileGate';
 import useStories from './hooks/useStories';
+import StoryTray from './components/StoryTray';
 
 function App() {
   const { users, loading, error, reload } = useStories();
+  const [seenUserIds, setSeenUserIds] = useState(new Set());
+
+  const handleUserClick = (user, index) => {
+    console.log(`Clicked user ${user.username} at index ${index}`);
+  };
 
   return (
     <MobileGate>
@@ -24,11 +31,14 @@ function App() {
           </div>
         </header>
         
-        <main className="flex-1 flex flex-col pt-4 overflow-hidden">
+        <main className="flex-1 flex flex-col pt-0 overflow-hidden">
           {loading && (
-            <div className="flex gap-4 px-4 overflow-hidden">
+            <div className="flex gap-4 px-3 py-3 overflow-hidden border-b border-ig-border">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="w-16 h-16 rounded-full animate-pulse bg-ig-surface shrink-0" />
+                <div key={i} className="flex flex-col items-center gap-1 shrink-0">
+                  <div className="w-[73px] h-[73px] rounded-full animate-pulse bg-ig-surface" />
+                  <div className="w-12 h-2.5 mt-1 rounded animate-pulse bg-ig-surface" />
+                </div>
               ))}
             </div>
           )}
@@ -46,11 +56,11 @@ function App() {
           )}
 
           {!loading && !error && users && (
-            <div className="flex gap-4 px-4 overflow-x-auto pb-4 hide-scrollbar">
-              {users.map(u => (
-                <div key={u.id} className="text-ig-text shrink-0">{u.username}</div>
-              ))}
-            </div>
+            <StoryTray 
+              users={users} 
+              seenUserIds={seenUserIds} 
+              onUserClick={handleUserClick} 
+            />
           )}
         </main>
       </div>

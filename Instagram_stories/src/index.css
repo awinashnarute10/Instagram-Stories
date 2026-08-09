@@ -20,3 +20,10 @@ html, body {
 img {
   -webkit-user-drag: none;
 }
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
