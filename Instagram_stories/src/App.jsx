@@ -6,7 +6,7 @@ import StoryViewer from './components/StoryViewer';
 
 function App() {
   const { users, loading, error, reload } = useStories();
-  const [seenUserIds, setSeenUserIds] = useState(new Set());
+  const [seenStoryIds, setSeenStoryIds] = useState(new Set());
   const [viewer, setViewer] = useState(null); // null | { userIndex, storyIndex }
 
   // Preload first story of each user for instant initial open
@@ -20,15 +20,25 @@ function App() {
     }
   }, [users]);
 
-  const handleUserClick = (user, index) => {
-    setSeenUserIds(prev => {
+  const markStorySeen = useCallback((storyId) => {
+    setSeenStoryIds(prev => {
+      if (prev.has(storyId)) return prev;
       const next = new Set(prev);
-      next.add(user.id);
+      next.add(storyId);
       return next;
     });
+  }, []);
+
+  const handleUserClick = (user, index) => {
+    let targetStoryIndex = user.stories.findIndex(s => !seenStoryIds.has(s.id));
+    if (targetStoryIndex === -1) {
+      targetStoryIndex = 0;
+    }
+
+    markStorySeen(user.stories[targetStoryIndex].id);
     setViewer({
       userIndex: index,
-      storyIndex: 0
+      storyIndex: targetStoryIndex
     });
   };
 
@@ -42,29 +52,33 @@ function App() {
     const currentUser = users[userIndex];
     
     if (storyIndex < currentUser.stories.length - 1) {
+      markStorySeen(currentUser.stories[storyIndex + 1].id);
       setViewer({ userIndex, storyIndex: storyIndex + 1 });
     } else if (userIndex < users.length - 1) {
       const nextUser = users[userIndex + 1];
-      setSeenUserIds(prev => new Set(prev).add(nextUser.id));
+      markStorySeen(nextUser.stories[0].id);
       setViewer({ userIndex: userIndex + 1, storyIndex: 0 });
     } else {
       handleCloseViewer();
     }
-  }, [viewer, users]);
+  }, [viewer, users, markStorySeen]);
 
   const goPrev = useCallback(() => {
     if (!viewer || !users) return;
     const { userIndex, storyIndex } = viewer;
     
     if (storyIndex > 0) {
+      markStorySeen(users[userIndex].stories[storyIndex - 1].id);
       setViewer({ userIndex, storyIndex: storyIndex - 1 });
     } else if (userIndex > 0) {
       const prevUser = users[userIndex - 1];
-      setViewer({ userIndex: userIndex - 1, storyIndex: prevUser.stories.length - 1 });
+      const prevStoryIndex = prevUser.stories.length - 1;
+      markStorySeen(prevUser.stories[prevStoryIndex].id);
+      setViewer({ userIndex: userIndex - 1, storyIndex: prevStoryIndex });
     } else {
       setViewer({ userIndex, storyIndex: 0 });
     }
-  }, [viewer, users]);
+  }, [viewer, users, markStorySeen]);
 
   useEffect(() => {
     if (!viewer) return;
@@ -124,7 +138,7 @@ function App() {
           {!loading && !error && users && (
             <StoryTray 
               users={users} 
-              seenUserIds={seenUserIds} 
+              seenStoryIds={seenStoryIds} 
               onUserClick={handleUserClick} 
             />
           )}
