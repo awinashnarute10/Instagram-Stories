@@ -17,13 +17,15 @@ export default function StoryViewer({ users, userIndex, storyIndex, onClose, onN
 
   // Cross-fade state: Keep track of previous stories for smooth transition
   const [renderStories, setRenderStories] = useState([story]);
-  useEffect(() => {
-    setRenderStories(prev => {
-      const last = prev[prev.length - 1];
-      if (last.id === story.id) return prev;
-      return [last, story];
-    });
-  }, [story]);
+  const [prevStoryId, setPrevStoryId] = useState(story.id);
+
+  if (story.id !== prevStoryId) {
+    const last = renderStories[renderStories.length - 1];
+    if (last.id !== story.id) {
+      setRenderStories([last, story]);
+    }
+    setPrevStoryId(story.id);
+  }
 
   // Auto-advance if error occurs
   useEffect(() => {

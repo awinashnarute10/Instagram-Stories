@@ -1,25 +1,29 @@
 import { useState, useEffect } from 'react';
 
 export default function useImagePreload(src) {
-  const [state, setState] = useState({ loaded: false, error: false });
+  const [state, setState] = useState({ loaded: false, error: false, currentSrc: src });
+
+  if (src !== state.currentSrc) {
+    setState({ loaded: false, error: false, currentSrc: src });
+  }
 
   useEffect(() => {
-    if (!src) {
-      setState({ loaded: false, error: false });
-      return;
-    }
+    if (!src) return;
 
     let isMounted = true;
-    setState({ loaded: false, error: false });
 
     const img = new Image();
     img.onload = () => {
-      if (isMounted) setState({ loaded: true, error: false });
+      if (isMounted) setState(s => ({ ...s, loaded: true, error: false }));
     };
     img.onerror = () => {
-      if (isMounted) setState({ loaded: false, error: true });
+      if (isMounted) setState(s => ({ ...s, loaded: false, error: true }));
     };
     img.src = src;
+
+    if (img.complete && img.naturalWidth !== 0) {
+      if (isMounted) setState(s => ({ ...s, loaded: true, error: false }));
+    }
 
     return () => {
       isMounted = false;

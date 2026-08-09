@@ -5,9 +5,11 @@ export default function useStories() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchStories = useCallback(async (signal) => {
-    setLoading(true);
-    setError(null);
+  const fetchStories = useCallback(async (signal, isReload = false) => {
+    if (isReload) {
+      setLoading(true);
+      setError(null);
+    }
     try {
       const response = await fetch('/stories.json', { signal });
       if (!response.ok) {
@@ -26,12 +28,12 @@ export default function useStories() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchStories(controller.signal);
+    fetchStories(controller.signal, false);
     return () => controller.abort();
   }, [fetchStories]);
 
   const reload = useCallback(() => {
-    fetchStories();
+    fetchStories(undefined, true);
   }, [fetchStories]);
 
   return { users, loading, error, reload };
