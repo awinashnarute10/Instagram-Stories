@@ -9,6 +9,17 @@ function App() {
   const [seenUserIds, setSeenUserIds] = useState(new Set());
   const [viewer, setViewer] = useState(null); // null | { userIndex, storyIndex }
 
+  // Preload first story of each user for instant initial open
+  useEffect(() => {
+    if (users) {
+      users.forEach(u => {
+        if (u.stories?.[0]?.image) {
+          new Image().src = u.stories[0].image;
+        }
+      });
+    }
+  }, [users]);
+
   const handleUserClick = (user, index) => {
     setSeenUserIds(prev => {
       const next = new Set(prev);

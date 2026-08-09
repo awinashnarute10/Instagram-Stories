@@ -1,26 +1,61 @@
 import { useEffect, useState } from 'react';
 import useStoryTimer from '../hooks/useStoryTimer';
 import ProgressBars from './ProgressBars';
+import useImagePreload from '../hooks/useImagePreload';
+import Spinner from './Spinner';
 
 export default function StoryViewer({ users, userIndex, storyIndex, onClose, onNext, onPrev }) {
   const [visible, setVisible] = useState(false);
 
+  const user = users[userIndex];
+  const story = user.stories[storyIndex];
+
+  const { loaded, error } = useImagePreload(story.image);
+
+  // Auto-advance if error occurs
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        onNext();
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [error, onNext]);
+
+  // Preload surrounding stories for instant navigation
+  useEffect(() => {
+    const urlsToPreload = [];
+    
+    // Next story in current user
+    if (storyIndex < user.stories.length - 1) {
+      urlsToPreload.push(user.stories[storyIndex + 1].image);
+    }
+    // Previous story in current user
+    if (storyIndex > 0) {
+      urlsToPreload.push(user.stories[storyIndex - 1].image);
+    }
+    // Next user's first story
+    if (userIndex < users.length - 1) {
+      urlsToPreload.push(users[userIndex + 1].stories[0].image);
+    }
+
+    urlsToPreload.forEach(url => {
+      if (url) {
+        new Image().src = url;
+      }
+    });
+  }, [users, userIndex, storyIndex, user]);
+
   const progress = useStoryTimer({
     duration: 5000,
-    running: true, // we'll control this with image loading later
+    running: loaded,
     onComplete: onNext,
     resetKey: `${userIndex}-${storyIndex}`,
   });
 
   useEffect(() => {
-    // Lock body scroll
     document.body.style.overflow = 'hidden';
-    
-    // Trigger enter animation on next frame to ensure starting styles are applied
-    const raf = requestAnimationFrame(() => {
-      setVisible(true);
-    });
-
+    const raf = requestAnimationFrame(() => setVisible(true));
     return () => {
       document.body.style.overflow = '';
       cancelAnimationFrame(raf);
@@ -29,11 +64,8 @@ export default function StoryViewer({ users, userIndex, storyIndex, onClose, onN
 
   const handleClose = () => {
     setVisible(false);
-    setTimeout(onClose, 250); // wait for fade out
+    setTimeout(onClose, 250); 
   };
-
-  const user = users[userIndex];
-  const story = user.stories[storyIndex];
 
   return (
     <div 
@@ -41,22 +73,29 @@ export default function StoryViewer({ users, userIndex, storyIndex, onClose, onN
         visible ? 'opacity-100 scale-100' : 'opacity-0 scale-[0.92]'
       }`}
     >
+      {!loaded && !error && (
+        <div className="absolute inset-0 flex items-center justify-center z-0">
+          <Spinner size="32px" />
+        </div>
+      )}
+
+      {error && (
+        <div className="absolute inset-0 flex items-center justify-center z-0 px-6 text-center">
+          <p className="text-white/70 text-[14px]">Couldn't load this story</p>
+        </div>
+      )}
+
       <img
-        key={story.id}
         src={story.image}
         alt="story"
-        className="absolute inset-0 w-full h-full object-contain"
+        className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-300 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
       />
       
       {/* Tap Zones */}
-      <div 
-        className="absolute inset-y-0 left-0 w-[30%] z-10" 
-        onClick={onPrev}
-      />
-      <div 
-        className="absolute inset-y-0 right-0 w-[70%] z-10" 
-        onClick={onNext}
-      />
+      <div className="absolute inset-y-0 left-0 w-[30%] z-10" onClick={onPrev} />
+      <div className="absolute inset-y-0 right-0 w-[70%] z-10" onClick={onNext} />
 
       <ProgressBars 
         count={user.stories.length} 
