@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ig-black: #000;
+  --color-ig-surface: #121212;
+  --color-ig-border: #262626;
+  --color-ig-text: #fafafa;
+  --color-ig-muted: #a8a8a8;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--color-ig-black);
+  color: var(--color-ig-text);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+img {
+  -webkit-user-drag: none;
+}
