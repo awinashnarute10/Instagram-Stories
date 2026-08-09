@@ -2,13 +2,30 @@ import { useState } from 'react';
 import MobileGate from './components/MobileGate';
 import useStories from './hooks/useStories';
 import StoryTray from './components/StoryTray';
+import StoryViewer from './components/StoryViewer';
 
 function App() {
   const { users, loading, error, reload } = useStories();
   const [seenUserIds, setSeenUserIds] = useState(new Set());
+  const [viewer, setViewer] = useState(null); // null | { userIndex, storyIndex }
 
   const handleUserClick = (user, index) => {
-    console.log(`Clicked user ${user.username} at index ${index}`);
+    // Mark user as seen
+    setSeenUserIds(prev => {
+      const next = new Set(prev);
+      next.add(user.id);
+      return next;
+    });
+    
+    // Open viewer
+    setViewer({
+      userIndex: index,
+      storyIndex: 0
+    });
+  };
+
+  const handleCloseViewer = () => {
+    setViewer(null);
   };
 
   return (
@@ -36,7 +53,7 @@ function App() {
             <div className="flex gap-4 px-3 py-3 overflow-hidden border-b border-ig-border">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex flex-col items-center gap-1 shrink-0">
-                  <div className="w-[73px] h-[73px] rounded-full animate-pulse bg-ig-surface" />
+                  <div className="w-[74px] h-[74px] rounded-full animate-pulse bg-ig-surface" />
                   <div className="w-12 h-2.5 mt-1 rounded animate-pulse bg-ig-surface" />
                 </div>
               ))}
@@ -63,6 +80,15 @@ function App() {
             />
           )}
         </main>
+
+        {viewer && (
+          <StoryViewer
+            users={users}
+            userIndex={viewer.userIndex}
+            storyIndex={viewer.storyIndex}
+            onClose={handleCloseViewer}
+          />
+        )}
       </div>
     </MobileGate>
   );
