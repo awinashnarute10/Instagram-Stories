@@ -1,0 +1,50 @@
+[
+  {
+    "id": "u1",
+    "username": "awinash",
+    "avatar": "https://picsum.photos/seed/awinash-av/160/160",
+    "stories": [
+      { "id": "u1-s1", "image": "https://picsum.photos/seed/aw-1/1080/1920", "postedAt": "2h" },
+      { "id": "u1-s2", "image": "https://picsum.photos/seed/aw-2/1080/1920", "postedAt": "3h" },
+      { "id": "u1-s3", "image": "https://picsum.photos/seed/aw-3/1080/1920", "postedAt": "5h" }
+    ]
+  },
+  {
+    "id": "u2",
+    "username": "amar",
+    "avatar": "https://picsum.photos/seed/amar-av/160/160",
+    "stories": [
+      { "id": "u2-s1", "image": "https://picsum.photos/seed/am-1/1080/1920", "postedAt": "1h" },
+      { "id": "u2-s2", "image": "https://picsum.photos/seed/am-2/1080/1920", "postedAt": "4h" }
+    ]
+  },
+  {
+    "id": "u3",
+    "username": "yash",
+    "avatar": "https://picsum.photos/seed/yash-av/160/160",
+    "stories": [
+      { "id": "u3-s1", "image": "https://picsum.photos/seed/ya-1/1080/1920", "postedAt": "30m" },
+      { "id": "u3-s2", "image": "https://picsum.photos/seed/ya-2/1080/1920", "postedAt": "2h" },
+      { "id": "u3-s3", "image": "https://picsum.photos/seed/ya-3/1080/1920", "postedAt": "6h" },
+      { "id": "u3-s4", "image": "https://picsum.photos/seed/ya-4/1080/1920", "postedAt": "8h" }
+    ]
+  },
+  {
+    "id": "u4",
+    "username": "gourav",
+    "avatar": "https://picsum.photos/seed/gourav-av/160/160",
+    "stories": [
+      { "id": "u4-s1", "image": "https://picsum.photos/seed/go-1/1080/1920", "postedAt": "10h" }
+    ]
+  },
+  {
+    "id": "u5",
+    "username": "harshit",
+    "avatar": "https://picsum.photos/seed/harshit-av/160/160",
+    "stories": [
+      { "id": "u5-s1", "image": "https://picsum.photos/seed/ha-1/1080/1920", "postedAt": "15m" },
+      { "id": "u5-s2", "image": "https://picsum.photos/seed/ha-2/1080/1920", "postedAt": "1h" },
+      { "id": "u5-s3", "image": "https://picsum.photos/seed/ha-3/1080/1920", "postedAt": "4h" }
+    ]
+  }
+]
