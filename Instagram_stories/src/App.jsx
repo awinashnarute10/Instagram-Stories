@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import MobileGate from './components/MobileGate';
 import useStories from './hooks/useStories';
 import StoryTray from './components/StoryTray';
@@ -10,14 +10,11 @@ function App() {
   const [viewer, setViewer] = useState(null); // null | { userIndex, storyIndex }
 
   const handleUserClick = (user, index) => {
-    // Mark user as seen
     setSeenUserIds(prev => {
       const next = new Set(prev);
       next.add(user.id);
       return next;
     });
-    
-    // Open viewer
     setViewer({
       userIndex: index,
       storyIndex: 0
@@ -27,6 +24,47 @@ function App() {
   const handleCloseViewer = () => {
     setViewer(null);
   };
+
+  const goNext = useCallback(() => {
+    if (!viewer || !users) return;
+    const { userIndex, storyIndex } = viewer;
+    const currentUser = users[userIndex];
+    
+    if (storyIndex < currentUser.stories.length - 1) {
+      setViewer({ userIndex, storyIndex: storyIndex + 1 });
+    } else if (userIndex < users.length - 1) {
+      const nextUser = users[userIndex + 1];
+      setSeenUserIds(prev => new Set(prev).add(nextUser.id));
+      setViewer({ userIndex: userIndex + 1, storyIndex: 0 });
+    } else {
+      handleCloseViewer();
+    }
+  }, [viewer, users]);
+
+  const goPrev = useCallback(() => {
+    if (!viewer || !users) return;
+    const { userIndex, storyIndex } = viewer;
+    
+    if (storyIndex > 0) {
+      setViewer({ userIndex, storyIndex: storyIndex - 1 });
+    } else if (userIndex > 0) {
+      const prevUser = users[userIndex - 1];
+      setViewer({ userIndex: userIndex - 1, storyIndex: prevUser.stories.length - 1 });
+    } else {
+      setViewer({ userIndex, storyIndex: 0 });
+    }
+  }, [viewer, users]);
+
+  useEffect(() => {
+    if (!viewer) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'Escape') handleCloseViewer();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [viewer, goNext, goPrev]);
 
   return (
     <MobileGate>
@@ -87,6 +125,8 @@ function App() {
             userIndex={viewer.userIndex}
             storyIndex={viewer.storyIndex}
             onClose={handleCloseViewer}
+            onNext={goNext}
+            onPrev={goPrev}
           />
         )}
       </div>
