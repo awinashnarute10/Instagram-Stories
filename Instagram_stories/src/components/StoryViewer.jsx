@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
+import useStoryTimer from '../hooks/useStoryTimer';
+import ProgressBars from './ProgressBars';
 
 export default function StoryViewer({ users, userIndex, storyIndex, onClose, onNext, onPrev }) {
   const [visible, setVisible] = useState(false);
+
+  const progress = useStoryTimer({
+    duration: 5000,
+    running: true, // we'll control this with image loading later
+    onComplete: onNext,
+    resetKey: `${userIndex}-${storyIndex}`,
+  });
 
   useEffect(() => {
     // Lock body scroll
@@ -33,6 +42,7 @@ export default function StoryViewer({ users, userIndex, storyIndex, onClose, onN
       }`}
     >
       <img
+        key={story.id}
         src={story.image}
         alt="story"
         className="absolute inset-0 w-full h-full object-contain"
@@ -46,6 +56,12 @@ export default function StoryViewer({ users, userIndex, storyIndex, onClose, onN
       <div 
         className="absolute inset-y-0 right-0 w-[70%] z-10" 
         onClick={onNext}
+      />
+
+      <ProgressBars 
+        count={user.stories.length} 
+        activeIndex={storyIndex} 
+        progress={progress} 
       />
 
       {/* Top Gradient Overlay */}
