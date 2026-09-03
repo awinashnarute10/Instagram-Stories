@@ -7,7 +7,7 @@ import StoryViewer from './components/StoryViewer';
 function App() {
   const { users, loading, error, reload } = useStories();
   const [seenStoryIds, setSeenStoryIds] = useState(new Set());
-  const [viewer, setViewer] = useState(null); // null | { userIndex, storyIndex }
+  const [viewer, setViewer] = useState(null); 
 
   // Preload first story of each user for instant initial open
   useEffect(() => {
