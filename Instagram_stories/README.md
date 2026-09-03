@@ -63,4 +63,4 @@ The timer loop is strictly gated by image load status. `useImagePreload` uses a 
 State is centrally managed in `App.jsx`, tracking both the currently active viewer coordinates (`{userIndex, storyIndex}`) and a Set of `seenStoryIds`. 
 - Navigating `Next` seamlessly advances the `storyIndex`, and upon reaching the end of a user's array, immediately skips to the next user's index 0.
 - Navigating `Prev` traverses backwards, catching the last story of the previous user.
-- These coordinate changes flow down to `StoryViewer`, triggering instantaneous background cross-fades between the preloaded images 
+- These coordinate changes flow down to `StoryViewer`, triggering instantaneous background cross-fades between the preloaded images.
